@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Core</string>
+    <string name="unknown_error">Error tidak diketahui</string>
+    <string name="http_unknown_error">HTTP Error tidak diketahui (kecuali: 4xx/5xx)</string>
+    <string name="network_error">Terjadi kesalahan pada jaringan, silahkan coba lagi nanti</string>
+    <string name="client_error">Terjadi kesalahan, mohon periksa masukan anda</string>
+    <string name="server_error">Terjadi kesalahan pada Server, silahkan coba lagi nanti</string>
+</resources>

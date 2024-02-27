@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Core</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="http_unknown_error">Unknown HTTP Error (except: 4xx/5xx)</string>
+    <string name="network_error">Network error, please try again later</string>
+    <string name="client_error">An error occurred, kindly check your input</string>
+    <string name="server_error">Server error, please try again later</string>
 </resources>
