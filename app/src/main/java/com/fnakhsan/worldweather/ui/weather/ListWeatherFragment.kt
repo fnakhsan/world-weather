@@ -1,19 +1,31 @@
 package com.fnakhsan.worldweather.ui.weather
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fnakhsan.core.domain.model.WeatherModel
+import com.fnakhsan.worldweather.R
 import com.fnakhsan.worldweather.databinding.FragmentListWeatherBinding
 import com.fnakhsan.worldweather.ui.detail.DetailWeatherActivity
 import com.fnakhsan.worldweather.ui.utils.BaseSnackBar.errorSnackBar
 import com.fnakhsan.worldweather.ui.utils.EXTRA_WEATHER
 import com.fnakhsan.worldweather.ui.utils.UiState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,6 +33,24 @@ class ListWeatherFragment : Fragment() {
     private var _binding: FragmentListWeatherBinding? = null
     private val binding get() = _binding
     private val viewModel: WeatherViewModel by viewModels()
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var location: Location? = null
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+            }
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,8 +65,8 @@ class ListWeatherFragment : Fragment() {
 
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
         binding?.rvWeather?.layoutManager = layoutManager
-
-        viewModel.searchWeather("Kudus")
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        getMyLastLocation()
         viewModel.data.observe(viewLifecycleOwner) {
             when (it) {
                 is UiState.Loading -> showLoading(true)
@@ -66,6 +96,54 @@ class ListWeatherFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun getMyLastLocation() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ) {
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token).addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    viewModel.searchWeather(location.latitude, location.longitude)
+                    this.location = location
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.error_no_location,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } else {
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+//        else if (checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+//            fusedLocationClient.lastLocation.addOnSuccessListener {
+//                if (location != null) {
+//                    Log.d("location", "masuk jelek")
+//                    this.location = location
+//                } else {
+//                    Toast.makeText(
+//                        requireContext(),
+//                        R.string.error_no_location,
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            }
+//        }
+
     }
 
     private fun showData(data: List<WeatherModel>) {

@@ -10,6 +10,7 @@ data class WeatherModel(
     val iconUrl: String,
     val description: String,
     val datetime: String,
+    val lastUpdate: String,
     val temperature: Double,
     val feelsLike: Double,
     val humidity: Int,

@@ -10,15 +10,19 @@ class WeatherInteractor @Inject constructor(private val weatherRepository: IWeat
         return weatherRepository.searchWeather(query)
     }
 
+    override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel>> {
+        return weatherRepository.searchWeather(lat, lon)
+    }
+
     override fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>> {
-        TODO("Not yet implemented")
+        return weatherRepository.getFavListWeather()
     }
 
-    override suspend fun setFavWeather(id: String) {
-        TODO("Not yet implemented")
+    override suspend fun setFavWeather(weatherModel: WeatherModel) {
+        return weatherRepository.setFavWeather(weatherModel)
     }
 
-    override fun isFavWeather(id: String): Flow<DataResource<Boolean>> {
-        TODO("Not yet implemented")
+    override fun isFavWeather(id: Int): Flow<Boolean> {
+        return weatherRepository.isFavWeather(id = id)
     }
 }

@@ -1,10 +1,47 @@
 package com.fnakhsan.core.data.mapper
 
+import android.util.Log
+import com.fnakhsan.core.data.model.weather.WeatherEntity
 import com.fnakhsan.core.data.model.weather.WeatherResponse
 import com.fnakhsan.core.domain.model.WeatherModel
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.TimeZone
+
+val nowDateTime = LocalDateTime.now(ZoneOffset.UTC).toInstant(ZoneOffset.UTC).toEpochMilli()
+
+fun localizeDateTime(epochMillis: Long): String = Instant.ofEpochMilli(epochMillis).atZone(
+    ZoneId.systemDefault()
+).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+fun epochMillisUtc(dateTimeString: String): Long {
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val date = formatter.parse(dateTimeString)
+
+    // Get the system's default time zone
+    val defaultTimeZone = TimeZone.getDefault()
+
+    // Create a calendar instance with the parsed date and default time zone
+    val calendar = Calendar.getInstance(defaultTimeZone)
+    if (date != null) {
+        calendar.time = date
+    }
+
+
+    // Set the calendar's time zone to UTC
+    calendar.timeZone = TimeZone.getTimeZone("UTC")
+
+    Log.d("dt", calendar.toString())
+
+    // Get the milliseconds since epoch in UTC
+    return calendar.timeInMillis
+}
+
 
 fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
     val weather = response.weather?.first()
@@ -14,9 +51,8 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
         location = response.name ?: "",
         iconUrl = iconUrlMapper(weather?.icon ?: ""),
         description = weather?.description ?: "",
-        datetime = Instant.ofEpochMilli(response.dt?.toLong() ?: 0).atZone(
-            ZoneId.systemDefault()
-        ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+        datetime = localizeDateTime(response.dt?.toLong() ?: 0),
+        lastUpdate = localizeDateTime(nowDateTime),
         temperature = main?.temp ?: 0.0,
         feelsLike = main?.feelsLike ?: 0.0,
         humidity = main?.humidity ?: 0,
@@ -25,3 +61,57 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
         cloudiness = response.clouds?.all ?: 0,
     )
 }
+
+fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
+    response.let {
+        WeatherEntity(
+            id = it.id ?: 0,
+            location = response.name ?: "",
+            iconUrl = iconUrlMapper(it.weather?.first()?.icon ?: ""),
+            description = it.weather?.first()?.description ?: "",
+            datetime = it.dt?.toLong() ?: 0,
+            lastUpdate = LocalDateTime.now(ZoneOffset.UTC).toInstant(ZoneOffset.UTC).toEpochMilli(),
+            temperature = it.main?.temp ?: 0.0,
+            feelsLike = it.main?.feelsLike ?: 0.0,
+            humidity = it.main?.humidity ?: 0,
+            windSpeed = response.wind?.speed ?: 0.0,
+            visibility = response.visibility ?: 0,
+            cloudiness = response.clouds?.all ?: 0,
+        )
+    }
+
+fun mapEntitiesToModel(entity: WeatherEntity): WeatherModel =
+    entity.let {
+        WeatherModel(
+            id = it.id.toString(),
+            location = it.location,
+            iconUrl = iconUrlMapper(it.iconUrl),
+            description = it.description,
+            datetime = localizeDateTime(it.datetime),
+            lastUpdate = localizeDateTime(it.lastUpdate),
+            temperature = it.temperature,
+            feelsLike = it.feelsLike,
+            humidity = it.humidity,
+            windSpeed = it.windSpeed,
+            visibility = it.visibility,
+            cloudiness = it.cloudiness,
+        )
+    }
+
+fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
+    weather.let {
+        WeatherEntity(
+            id = it.id.toInt(),
+            location = it.location,
+            iconUrl = iconUrlMapper(it.iconUrl),
+            description = it.description,
+            datetime = epochMillisUtc(it.datetime),
+            lastUpdate = epochMillisUtc(it.lastUpdate),
+            temperature = it.temperature,
+            feelsLike = it.feelsLike,
+            humidity = it.humidity,
+            windSpeed = it.windSpeed,
+            visibility = it.visibility,
+            cloudiness = it.cloudiness,
+        )
+    }

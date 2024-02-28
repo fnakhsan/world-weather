@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">World Weather</string>
     <string name="error">%1$s\n%2$s</string>
+    <string name="error_no_location">Tidak dapat menemukan lokasi Anda</string>
     <string name="favorite_selected">Hapus dari favorit</string>
     <string name="favorite_unselected">Tambah ke favorit</string>
     <string name="location">Lokasi</string>

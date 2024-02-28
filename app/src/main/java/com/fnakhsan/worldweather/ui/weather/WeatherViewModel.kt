@@ -50,4 +50,25 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
             }
         }
     }
+    fun searchWeather(lat: Double, lon: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            weatherUseCase.searchWeather(lat, lon).collectLatest {
+                when(it) {
+                    is DataResource.Loading -> {
+                        _data.postValue(UiState.Loading)
+                    }
+                    is DataResource.Success -> {
+                        _data.postValue(UiState.Success(setOf(it.data)))
+                    }
+                    is DataResource.Error -> {
+                        if (it.errorCode == "#ER404") {
+                            _data.postValue(UiState.Empty)
+                        } else {
+                            _data.postValue(UiState.Error(it.exception.message, it.errorCode))
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

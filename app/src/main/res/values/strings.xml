@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">World Weather</string>
     <string name="error">%1$s\n%2$s</string>
+    <string name="error_no_location">Unable to find your location</string>
     <string name="favorite_selected">Remove from favorite</string>
     <string name="favorite_unselected">Add to favorite</string>
     <string name="location">Location</string>

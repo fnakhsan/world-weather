@@ -57,5 +57,8 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
+    //    Location
+    implementation ("com.google.android.gms:play-services-location:21.1.0")
+
     implementation(project(":core"))
 }
