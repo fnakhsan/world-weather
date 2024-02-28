@@ -8,10 +8,8 @@ data class WeatherModel(
     val datetime: String,
     val temperature: Double,
     val feelsLike: Double,
-    val pressure: Double,
-    val humidity: Double,
-    val visibility: Double,
-    val cloudiness: Double,
-    val windSpeed: Double,
-    val windGust: Double,
+    val humidity: Int,
+    val visibility: Int,
+    val cloudiness: Int,
+    val windSpeed: Double
 )

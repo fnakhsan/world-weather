@@ -1,4 +1,4 @@
-package com.fnakhsan.worldweather.ui
+package com.fnakhsan.worldweather.ui.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

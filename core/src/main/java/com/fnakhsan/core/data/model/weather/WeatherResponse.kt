@@ -1,134 +1,141 @@
 package com.fnakhsan.core.data.model.weather
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class WeatherResponse(
 
-	@SerialName("visibility")
-	val visibility: Int,
+	@field:SerializedName("rain")
+	val rain: Rain? = null,
 
-	@SerialName("timezone")
-	val timezone: Int,
+	@field:SerializedName("visibility")
+	val visibility: Int? = null,
 
-	@SerialName("main")
-	val main: Main,
+	@field:SerializedName("timezone")
+	val timezone: Int? = null,
 
-	@SerialName("clouds")
-	val clouds: Clouds,
+	@field:SerializedName("main")
+	val main: Main? = null,
 
-	@SerialName("sys")
-	val sys: Sys,
+	@field:SerializedName("clouds")
+	val clouds: Clouds? = null,
 
-	@SerialName("dt")
-	val dt: Int,
+	@field:SerializedName("sys")
+	val sys: Sys? = null,
 
-	@SerialName("coord")
-	val coord: Coord,
+	@field:SerializedName("dt")
+	val dt: Int? = null,
 
-	@SerialName("weather")
-	val weather: List<WeatherItem>,
+	@field:SerializedName("coord")
+	val coord: Coord? = null,
 
-	@SerialName("name")
-	val name: String,
+	@field:SerializedName("weather")
+	val weather: List<WeatherItem?>? = null,
 
-	@SerialName("cod")
-	val cod: Int,
+	@field:SerializedName("name")
+	val name: String? = null,
 
-	@SerialName("id")
-	val id: Int,
+	@field:SerializedName("cod")
+	val cod: Int? = null,
 
-	@SerialName("base")
-	val base: String,
+	@field:SerializedName("id")
+	val id: Int? = null,
 
-	@SerialName("wind")
-	val wind: Wind
+	@field:SerializedName("base")
+	val base: String? = null,
+
+	@field:SerializedName("wind")
+	val wind: Wind? = null
 )
 
-@Serializable
-data class Main(
+data class Rain(
 
-	@SerialName("temp")
-	val temp: Double,
-
-	@SerialName("temp_min")
-	val tempMin: Double,
-
-	@SerialName("grnd_level")
-	val grndLevel: Int,
-
-	@SerialName("humidity")
-	val humidity: Int,
-
-	@SerialName("pressure")
-	val pressure: Int,
-
-	@SerialName("sea_level")
-	val seaLevel: Int,
-
-	@SerialName("feels_like")
-	val feelsLike: Double,
-
-	@SerialName("temp_max")
-	val tempMax: Double
+	@field:SerializedName("1h")
+	val jsonMember1h: Any? = null
 )
 
-@Serializable
-data class Sys(
-
-	@SerialName("country")
-	val country: String,
-
-	@SerialName("sunrise")
-	val sunrise: Int,
-
-	@SerialName("sunset")
-	val sunset: Int
-)
-
-@Serializable
-data class Coord(
-
-	@SerialName("lon")
-	val lon: Double,
-
-	@SerialName("lat")
-	val lat: Double
-)
-
-@Serializable
-data class Clouds(
-
-	@SerialName("all")
-	val all: Int
-)
-
-@Serializable
-data class WeatherItem(
-
-	@SerialName("icon")
-	val icon: String,
-
-	@SerialName("description")
-	val description: String,
-
-	@SerialName("main")
-	val main: String,
-
-	@SerialName("id")
-	val id: Int
-)
-
-@Serializable
 data class Wind(
 
-	@SerialName("deg")
-	val deg: Int,
+	@field:SerializedName("deg")
+	val deg: Int? = null,
 
-	@SerialName("speed")
-	val speed: Double,
+	@field:SerializedName("speed")
+	val speed: Double? = null,
 
-	@SerialName("gust")
-	val gust: Double
+	@field:SerializedName("gust")
+	val gust: Any? = null
+)
+
+data class Clouds(
+
+	@field:SerializedName("all")
+	val all: Int? = null
+)
+
+data class Coord(
+
+	@field:SerializedName("lon")
+	val lon: Any? = null,
+
+	@field:SerializedName("lat")
+	val lat: Any? = null
+)
+
+data class Main(
+
+	@field:SerializedName("temp")
+	val temp: Double? = null,
+
+	@field:SerializedName("temp_min")
+	val tempMin: Double? = null,
+
+	@field:SerializedName("grnd_level")
+	val grndLevel: Int? = null,
+
+	@field:SerializedName("humidity")
+	val humidity: Int? = null,
+
+	@field:SerializedName("pressure")
+	val pressure: Int? = null,
+
+	@field:SerializedName("sea_level")
+	val seaLevel: Int? = null,
+
+	@field:SerializedName("feels_like")
+	val feelsLike: Double? = null,
+
+	@field:SerializedName("temp_max")
+	val tempMax: Double? = null
+)
+
+data class Sys(
+
+	@field:SerializedName("country")
+	val country: String? = null,
+
+	@field:SerializedName("sunrise")
+	val sunrise: Int? = null,
+
+	@field:SerializedName("sunset")
+	val sunset: Int? = null,
+
+	@field:SerializedName("id")
+	val id: Int? = null,
+
+	@field:SerializedName("type")
+	val type: Int? = null
+)
+
+data class WeatherItem(
+
+	@field:SerializedName("icon")
+	val icon: String? = null,
+
+	@field:SerializedName("description")
+	val description: String? = null,
+
+	@field:SerializedName("main")
+	val main: String? = null,
+
+	@field:SerializedName("id")
+	val id: Int? = null
 )

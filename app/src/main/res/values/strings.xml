@@ -6,4 +6,5 @@
     <string name="temperature_label">Temperature</string>
     <string name="favorite_selected">Remove from favorite</string>
     <string name="favorite_unselected">Add to favorite</string>
+    <string name="error">%1$s\n%2$s</string>
 </resources>

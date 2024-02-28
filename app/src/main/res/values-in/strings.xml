@@ -7,4 +7,5 @@
     <string name="temperature_label">Suhu</string>
     <string name="favorite_selected">Hapus dari favorit</string>
     <string name="favorite_unselected">Tambah ke favorit</string>
+    <string name="error">%1$s\n%2$s</string>
 </resources>
