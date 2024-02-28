@@ -38,8 +38,8 @@
 
                 <ImageView
                     android:id="@+id/iv_weather"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:contentDescription="@string/weather"
                     tools:srcCompat="@tools:sample/avatars" />
 
@@ -56,10 +56,12 @@
 
                 <ImageView
                     android:id="@+id/iv_temperature"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
                     android:contentDescription="@string/temperature_label"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    android:scaleType="center"
+                    android:src="@drawable/ic_thermostat_24" />
 
                 <TextView
                     android:id="@+id/tv_temperature"
@@ -82,10 +84,11 @@
 
             <ImageView
                 android:id="@+id/btn_favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/favorite_unselected"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_favorite_default_48" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
