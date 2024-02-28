@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">World Weather</string>
+    <string name="location">Location</string>
+    <string name="weather">Weather</string>
+    <string name="temperature">%1$d \u212A</string>
+    <string name="temperature_label">Temperature</string>
+    <string name="favorite_selected">Remove from favorite</string>
+    <string name="favorite_unselected">Add to favorite</string>
 </resources>

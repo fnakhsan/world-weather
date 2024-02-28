@@ -50,10 +50,10 @@ data class WeatherResponse(
 data class Main(
 
 	@SerialName("temp")
-	val temp: Float,
+	val temp: Double,
 
 	@SerialName("temp_min")
-	val tempMin: Float,
+	val tempMin: Double,
 
 	@SerialName("grnd_level")
 	val grndLevel: Int,
@@ -68,10 +68,10 @@ data class Main(
 	val seaLevel: Int,
 
 	@SerialName("feels_like")
-	val feelsLike: Float,
+	val feelsLike: Double,
 
 	@SerialName("temp_max")
-	val tempMax: Float
+	val tempMax: Double
 )
 
 @Serializable
@@ -91,10 +91,10 @@ data class Sys(
 data class Coord(
 
 	@SerialName("lon")
-	val lon: Float,
+	val lon: Double,
 
 	@SerialName("lat")
-	val lat: Float
+	val lat: Double
 )
 
 @Serializable
@@ -127,8 +127,8 @@ data class Wind(
 	val deg: Int,
 
 	@SerialName("speed")
-	val speed: Float,
+	val speed: Double,
 
 	@SerialName("gust")
-	val gust: Float
+	val gust: Double
 )

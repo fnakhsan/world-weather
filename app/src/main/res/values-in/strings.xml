@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">World Weather</string>
+    <string name="location">Lokasi</string>
+    <string name="weather">Cuaca</string>
+    <string name="temperature">%1$d \u2103</string>
+    <string name="temperature_label">Suhu</string>
+    <string name="favorite_selected">Hapus dari favorit</string>
+    <string name="favorite_unselected">Tambah ke favorit</string>
+</resources>

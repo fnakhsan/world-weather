@@ -19,10 +19,10 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
         ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
         temperature = main.temp,
         feelsLike = main.feelsLike,
-        pressure = main.pressure.toFloat(),
-        humidity = main.humidity.toFloat(),
-        visibility = response.visibility.toFloat(),
-        cloudiness = response.clouds.all.toFloat(),
+        pressure = main.pressure.toDouble(),
+        humidity = main.humidity.toDouble(),
+        visibility = response.visibility.toDouble(),
+        cloudiness = response.clouds.all.toDouble(),
         windSpeed = response.wind.speed,
         windGust = response.wind.gust
     )
