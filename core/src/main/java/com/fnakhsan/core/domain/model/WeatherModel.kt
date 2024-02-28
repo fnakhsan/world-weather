@@ -1,5 +1,9 @@
 package com.fnakhsan.core.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class WeatherModel(
     val id: String,
     val location: String,
@@ -9,7 +13,7 @@ data class WeatherModel(
     val temperature: Double,
     val feelsLike: Double,
     val humidity: Int,
+    val windSpeed: Double,
     val visibility: Int,
-    val cloudiness: Int,
-    val windSpeed: Double
-)
+    val cloudiness: Int
+) : Parcelable

@@ -1,5 +1,6 @@
 package com.fnakhsan.worldweather.ui.weather
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.databinding.FragmentListWeatherBinding
+import com.fnakhsan.worldweather.ui.detail.DetailWeatherActivity
 import com.fnakhsan.worldweather.ui.utils.BaseSnackBar.errorSnackBar
+import com.fnakhsan.worldweather.ui.utils.EXTRA_WEATHER
 import com.fnakhsan.worldweather.ui.utils.UiState
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -69,6 +72,9 @@ class ListWeatherFragment : Fragment() {
         val adapter = ListWeatherAdapter()
         adapter.setOnItemClickCallback(object : ListWeatherAdapter.OnItemClickCallback {
             override fun onItemClicked(data: WeatherModel) {
+                val intent = Intent(requireContext(), DetailWeatherActivity::class.java)
+                intent.putExtra(EXTRA_WEATHER, data)
+                startActivity(intent)
             }
         })
         adapter.differ.submitList(data.toMutableList())

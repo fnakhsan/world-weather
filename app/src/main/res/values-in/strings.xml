@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">World Weather</string>
-    <string name="location">Lokasi</string>
-    <string name="weather">Cuaca</string>
-    <string name="temperature">%1$d \u2103</string>
-    <string name="temperature_label">Suhu</string>
+    <string name="error">%1$s\n%2$s</string>
     <string name="favorite_selected">Hapus dari favorit</string>
     <string name="favorite_unselected">Tambah ke favorit</string>
-    <string name="error">%1$s\n%2$s</string>
+    <string name="location">Lokasi</string>
+    <string name="weather">Cuaca</string>
+    <string name="date_time_label">Tanggal dan Waktu</string>
+    <string name="date_time">%1$s</string>
+    <string name="temperature_label">Suhu</string>
+    <string name="temperature">%1$.2f \u2103</string>
+    <string name="feels_like_label">Terasa seperti</string>
+    <string name="feels_like">%1$.2f \u2103</string>
+    <string name="humidity_label">Kelembapan</string>
+    <string name="humidity">%1$d %%</string>
+    <string name="wind_speed_label">Kecepatan angin</string>
+    <string name="wind_speed">%1$.2f m/s</string>
+    <string name="visibility_label">Jarak pandang</string>
+    <string name="visibility">%1$d m</string>
+    <string name="cloudiness_label">Awan</string>
+    <string name="cloudiness">%1$d %%</string>
 </resources>

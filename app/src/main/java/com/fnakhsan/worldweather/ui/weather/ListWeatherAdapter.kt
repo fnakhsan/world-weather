@@ -41,7 +41,7 @@ class ListWeatherAdapter : RecyclerView.Adapter<ListWeatherAdapter.ListViewHolde
                 Glide.with(itemView.context).load(data.iconUrl).fitCenter().into(ivWeather)
                 tvWeather.text = data.description
                 tvTemperature.text =
-                    itemView.context.resources.getString(R.string.temperature, data.temperature.toInt())
+                    itemView.context.resources.getString(R.string.temperature, data.temperature)
             }
             itemView.setOnClickListener { onItemClickCallback.onItemClicked(data) }
         }

@@ -11,5 +11,6 @@ interface ApiService {
         @Query("q") query: String,
         @Query("appid") apiKey: String = BuildConfig.API_KEY,
         @Query("lang") language: String? = null,
+        @Query("units") units: String? = null
     ): WeatherResponse
 }

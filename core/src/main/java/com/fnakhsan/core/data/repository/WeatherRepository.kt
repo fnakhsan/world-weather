@@ -20,8 +20,16 @@ class WeatherRepository @Inject constructor(
     private val apiService: ApiService
 ) : IWeatherRepository {
     override fun searchWeather(query: String): Flow<DataResource<WeatherModel>> = flow {
+        val lang = Locale.getDefault().language
         emit(asDataResourceSuspend({
-            weatherResponseToModel(apiService.getWeather(query = query, language = Locale.getDefault().language))
+            weatherResponseToModel(
+                if (lang == "in") apiService.getWeather(
+                    query = query,
+                    language = "id",
+                    units = "metric"
+                )
+                else apiService.getWeather(query = query)
+            )
         }, context))
     }
 

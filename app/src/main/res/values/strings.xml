@@ -1,10 +1,22 @@
 <resources>
     <string name="app_name">World Weather</string>
-    <string name="location">Location</string>
-    <string name="weather">Weather</string>
-    <string name="temperature">%1$d \u212A</string>
-    <string name="temperature_label">Temperature</string>
+    <string name="error">%1$s\n%2$s</string>
     <string name="favorite_selected">Remove from favorite</string>
     <string name="favorite_unselected">Add to favorite</string>
-    <string name="error">%1$s\n%2$s</string>
+    <string name="location">Location</string>
+    <string name="weather">Weather</string>
+    <string name="date_time_label">Date and Time</string>
+    <string name="date_time">%1$s</string>
+    <string name="temperature_label">Temperature</string>
+    <string name="temperature">%1$.2f \u212A</string>
+    <string name="feels_like_label">Feels Like</string>
+    <string name="feels_like">%1$.2f \u212A</string>
+    <string name="humidity_label">Humidity</string>
+    <string name="humidity">%1$d %%</string>
+    <string name="wind_speed_label">Wind Speed</string>
+    <string name="wind_speed">%1$.2f m/s</string>
+    <string name="visibility_label">Visibility</string>
+    <string name="visibility">%1$d m</string>
+    <string name="cloudiness_label">Cloudiness</string>
+    <string name="cloudiness">%1$d %%</string>
 </resources>

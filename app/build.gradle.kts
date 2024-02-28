@@ -50,6 +50,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
     //    Navigation
     val navVersion = "2.7.7"

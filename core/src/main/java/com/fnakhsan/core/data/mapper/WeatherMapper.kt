@@ -20,8 +20,8 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
         temperature = main?.temp ?: 0.0,
         feelsLike = main?.feelsLike ?: 0.0,
         humidity = main?.humidity ?: 0,
+        windSpeed = response.wind?.speed ?: 0.0,
         visibility = response.visibility ?: 0,
         cloudiness = response.clouds?.all ?: 0,
-        windSpeed = response.wind?.speed ?: 0.0,
     )
 }
