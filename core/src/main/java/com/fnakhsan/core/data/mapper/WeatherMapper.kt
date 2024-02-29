@@ -84,6 +84,28 @@ fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
         )
     }
 
+fun mapResponsesToFavEntities(response: WeatherResponse): WeatherEntity =
+    response.let {
+        Log.d("mapper", "mapResponsesToEntities")
+        WeatherEntity(
+            id = it.id ?: 0,
+            location = response.name ?: "",
+            latitude = it.coord?.lat ?: 0.0,
+            longitude = it.coord?.lon ?: 0.0,
+            iconUrl = it.weather?.first()?.icon ?: "",
+            description = it.weather?.first()?.description ?: "",
+            datetime = it.dt?.toLong() ?: 0,
+            lastUpdate = LocalDateTime.now(ZoneOffset.UTC).toInstant(ZoneOffset.UTC).toEpochMilli(),
+            temperature = it.main?.temp ?: 0.0,
+            feelsLike = it.main?.feelsLike ?: 0.0,
+            humidity = it.main?.humidity ?: 0,
+            windSpeed = response.wind?.speed ?: 0.0,
+            visibility = response.visibility ?: 0,
+            cloudiness = response.clouds?.all ?: 0,
+            isFavorite = true
+        )
+    }
+
 fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
     entity.let {
         Log.d("mapper", "mapEntitiesToModel")
@@ -123,5 +145,27 @@ fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
             windSpeed = it.windSpeed,
             visibility = it.visibility,
             cloudiness = it.cloudiness,
+        )
+    }
+
+fun mapModelToFavEntities(weather: WeatherModel): WeatherEntity =
+    weather.let {
+        Log.d("mapper", "mapModelToEntities")
+        WeatherEntity(
+            id = it.id.toInt(),
+            location = it.location,
+            latitude = it.latitude,
+            longitude = it.longitude,
+            iconUrl = it.iconUrl,
+            description = it.description,
+            datetime = epochMillisUtc(it.datetime),
+            lastUpdate = epochMillisUtc(it.lastUpdate),
+            temperature = it.temperature,
+            feelsLike = it.feelsLike,
+            humidity = it.humidity,
+            windSpeed = it.windSpeed,
+            visibility = it.visibility,
+            cloudiness = it.cloudiness,
+            isFavorite = true
         )
     }

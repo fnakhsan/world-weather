@@ -92,8 +92,7 @@ class ListWeatherFragment : Fragment() {
                 if (location != null) {
                     lifecycleScope.launch {
                         async { viewModel.searchWeather(location.latitude, location.longitude) }.await()
-
-//                        val deferred2 = async { viewModel.getFavLocationWeather() }.await()
+                        async { viewModel.getFavLocationWeather() }.await()
                         viewModel.data.observe(viewLifecycleOwner) {
                             when (it) {
                                 is UiState.Loading -> showLoading(true)

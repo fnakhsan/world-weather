@@ -19,8 +19,9 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase) :
     ViewModel() {
 
-    private val _data = MutableLiveData<UiState<Set<WeatherModel>>>()
-    val data: LiveData<UiState<Set<WeatherModel>>> = _data
+    private val _data = MutableLiveData<UiState<MutableSet<WeatherModel>>>()
+    val data: LiveData<UiState<MutableSet<WeatherModel>>> = _data
+    private val weatherSet = mutableSetOf<WeatherModel>()
 
     fun searchWeather(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -31,9 +32,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     }
 
                     is DataResource.Success -> {
-                        _data.postValue(
-                            if (it.data != null) UiState.Success(setOf(it.data!!)) else UiState.Empty
-                        )
+                        if (it.data != null) {
+                            weatherSet.add(it.data!!)
+                            _data.postValue(UiState.Success(weatherSet))
+                        } else UiState.Empty
                     }
 
                     is DataResource.Error -> {
@@ -58,9 +60,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
 
                     is DataResource.Success -> {
                         Log.d("data", "vm" + it.data.toString())
-                        _data.postValue(
-                            if (it.data != null) UiState.Success(setOf(it.data!!)) else UiState.Empty
-                        )
+                        if (it.data != null) {
+                            weatherSet.add(it.data!!)
+                            _data.postValue(UiState.Success(weatherSet))
+                        } else UiState.Empty
                     }
 
                     is DataResource.Error -> {
@@ -84,7 +87,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     }
 
                     is DataResource.Success -> {
-                        _data.postValue(UiState.Success(it.data.toSet()))
+                        it.data.forEach { data ->
+                            weatherSet.add(data)
+                        }
+                        _data.postValue(UiState.Success(weatherSet))
                     }
 
                     is DataResource.Error -> {

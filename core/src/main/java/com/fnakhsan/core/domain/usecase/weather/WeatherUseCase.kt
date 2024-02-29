@@ -11,7 +11,7 @@ interface WeatherUseCase {
 
     fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>>
 
-    suspend fun setFavWeather(weatherModel: WeatherModel)
+    fun setFavWeather(weatherModel: WeatherModel)
 
     fun isFavWeather(id: Int): Flow<Boolean>
 }

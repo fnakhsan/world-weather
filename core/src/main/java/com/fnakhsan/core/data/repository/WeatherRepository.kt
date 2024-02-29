@@ -3,9 +3,11 @@ package com.fnakhsan.core.data.repository
 import android.content.Context
 import android.util.Log
 import com.fnakhsan.core.data.base.DataResource
+import com.fnakhsan.core.data.base.asDataResourceFlow
 import com.fnakhsan.core.data.mapper.mapEntitiesToModel
-import com.fnakhsan.core.data.mapper.mapModelToEntities
+import com.fnakhsan.core.data.mapper.mapModelToFavEntities
 import com.fnakhsan.core.data.mapper.mapResponsesToEntities
+import com.fnakhsan.core.data.mapper.mapResponsesToFavEntities
 import com.fnakhsan.core.data.model.weather.WeatherResponse
 import com.fnakhsan.core.data.source.database.WeatherLocalDataSource
 import com.fnakhsan.core.data.source.datastore.WeatherDatastore
@@ -16,8 +18,6 @@ import com.fnakhsan.core.utils.AppExecutors
 import com.fnakhsan.core.utils.isNetworkAvailable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -48,7 +48,7 @@ class WeatherRepository @Inject constructor(
 
     override fun searchWeather(query: String): Flow<DataResource<WeatherModel?>> =
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
-            override fun loadFromDB(data: WeatherResponse?): Flow<WeatherModel?> {
+            override fun loadFromDB(): Flow<WeatherModel?> {
                 return localDataSource.getLocation(query).map {
                     mapEntitiesToModel(it)
                 }
@@ -68,12 +68,9 @@ class WeatherRepository @Inject constructor(
 
     override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel?>> =
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
-            override fun loadFromDB(data: WeatherResponse?): Flow<WeatherModel?> {
+            override fun loadFromDB(): Flow<WeatherModel?> {
                 Log.d("mapper", "loadDb $lat, $lon")
-                return if (data != null) localDataSource.getLocation(data.name!!).map {
-                    Log.d("mapper", it.toString())
-                    mapEntitiesToModel(it)
-                } else localDataSource.getLocation( getLocation() ?: "").map {
+                return localDataSource.getLocation(getLocation() ?: "").map {
                     mapEntitiesToModel(it)
                 }
             }
@@ -86,10 +83,10 @@ class WeatherRepository @Inject constructor(
 
             override suspend fun saveCallResult(data: WeatherResponse) {
                 weatherDatastore.saveLocation(data.name.toString())
-                val weather = mapResponsesToEntities(data)
+                val weather = mapResponsesToFavEntities(data)
                 Log.d("mapper", "saveDb $weather")
-                localDataSource.upsertFavoriteLocation(weather)
                 weatherCurrLocation = mapEntitiesToModel(weather)
+                localDataSource.upsertFavoriteLocation(weather)
             }
         }.asFlow()
 
@@ -103,50 +100,99 @@ class WeatherRepository @Inject constructor(
 //        }
 //    }
 
-    override fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>> = channelFlow {
-        Log.d("fav", "masuk")
-        val listWeather = mutableListOf<WeatherModel>()
-        weatherCurrLocation?.let { listWeather.add(it) }
-        Log.d("fav", "masuk $listWeather")
-        localDataSource.getListFavoriteLocation().collectLatest {
-            it.map { item ->
-                val locations = setOf(
-                    "New York",
-                    "Singapore",
-                    "Mumbai",
-                    "Delhi",
-                    "Sydney",
-                    "Melbourne",
-                    item?.location
-                )
-                locations.map { location ->
-                    if (location != null) {
-                        Log.d("fav", "masuk lokasi")
-                        searchWeather(location).collectLatest { search ->
-                            when (search) {
-                                is DataResource.Success -> {
-                                    Log.d("fav", "masuk ${search.data}")
-//                                    listWeather.add(search.data)
-                                }
+//    suspend fun setInitFav() {
+//        Log.d("fav", "masuk")
+//        searchWeather("New York").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        searchWeather("Singapore").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        searchWeather("Mumbai").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        searchWeather("Delhi").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        searchWeather("Sydney").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        searchWeather("Melbourne").collectLatest {
+//            when (it) {
+//                is DataResource.Success -> {
+//                    if (it.data != null) {
+//                        setFavWeather(it.data)
+//                    }
+//                }
+//
+//                else -> {}
+//            }
+//        }
+//        val locations = setOf(
+//            "New York",
+//            "Singapore",
+//            "Mumbai",
+//            "Delhi",
+//            "Sydney",
+//            "Melbourne"
+//        )
+//    }
 
-                                is DataResource.Error ->
-                                    send(DataResource.Error(search.exception, search.errorCode))
-
-                                is DataResource.Loading -> send(DataResource.Loading)
-                            }
-                        }
-                    }
-                }
+    override fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>> =
+        localDataSource.getListFavoriteLocation().map { list ->
+            list.filter {
+                it?.location != getLocation()
+            }.map { entity ->
+                mapEntitiesToModel(entity)
             }
-        }
-        send(DataResource.Success(listWeather))
-    }
+        }.asDataResourceFlow(context)
 
-    override suspend fun setFavWeather(weatherModel: WeatherModel) {
+
+    override fun setFavWeather(weatherModel: WeatherModel) {
         appExecutors.diskIO()
             .execute {
                 localDataSource.upsertFavoriteLocation(
-                    mapModelToEntities(weatherModel)
+                    mapModelToFavEntities(weatherModel)
                 )
             }
     }

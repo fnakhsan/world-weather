@@ -18,7 +18,7 @@ class WeatherInteractor @Inject constructor(private val weatherRepository: IWeat
         return weatherRepository.getFavListWeather()
     }
 
-    override suspend fun setFavWeather(weatherModel: WeatherModel) {
+    override fun setFavWeather(weatherModel: WeatherModel) {
         return weatherRepository.setFavWeather(weatherModel)
     }
 

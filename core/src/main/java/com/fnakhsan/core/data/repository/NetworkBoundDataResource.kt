@@ -12,14 +12,13 @@ abstract class NetworkBoundDataResource<ResultType, RequestType> {
 
     private var result: Flow<DataResource<ResultType>> = flow {
         emit(DataResource.Loading)
-        val dbSource = loadFromDB(null).first()
+        val dbSource = loadFromDB().first()
         if (shouldFetch(dbSource)) {
             emit(DataResource.Loading)
             when (val apiResponse = createCall().first()) {
                 is DataResource.Success -> {
-                    val data = apiResponse.data
-                    saveCallResult(data)
-                    emitAll(loadFromDB(data).map {
+                    saveCallResult(apiResponse.data)
+                    emitAll(loadFromDB().map {
                         Log.d("data", "nbr $it")
                         DataResource.Success(it)
                     })
@@ -35,13 +34,13 @@ abstract class NetworkBoundDataResource<ResultType, RequestType> {
                 }
             }
         } else {
-            emitAll(loadFromDB(null).map { DataResource.Success(it) })
+            emitAll(loadFromDB().map { DataResource.Success(it) })
         }
     }
 
     protected open fun onFetchFailed() {}
 
-    protected abstract fun loadFromDB(data: RequestType?): Flow<ResultType>
+    protected abstract fun loadFromDB(): Flow<ResultType>
 
     protected abstract fun shouldFetch(data: ResultType?): Boolean
 
