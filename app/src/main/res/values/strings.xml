@@ -20,4 +20,7 @@
     <string name="visibility">%1$d m</string>
     <string name="cloudiness_label">Cloudiness</string>
     <string name="cloudiness">%1$d %%</string>
+    <string name="search_hint">Discover the weather in various locations!</string>
+    <string name="search_placeholder">London,UK</string>
+    <string name="last_update">Last update: %1$s</string>
 </resources>

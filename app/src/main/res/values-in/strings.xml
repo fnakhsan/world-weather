@@ -21,4 +21,7 @@
     <string name="visibility">%1$d m</string>
     <string name="cloudiness_label">Awan</string>
     <string name="cloudiness">%1$d %%</string>
+    <string name="search_hint">Temukan cuaca diberbagai lokasi!</string>
+    <string name="search_placeholder">Sleman,Indonesia</string>
+    <string name="last_update">Pembaruan terakhir: %1$s</string>
 </resources>

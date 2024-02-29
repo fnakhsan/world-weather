@@ -2,8 +2,9 @@ package com.fnakhsan.worldweather.ui.weather
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.fnakhsan.core.data.base.DataResource
 import com.fnakhsan.core.domain.model.WeatherModel
@@ -11,7 +12,9 @@ import com.fnakhsan.core.domain.usecase.weather.WeatherUseCase
 import com.fnakhsan.worldweather.ui.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,36 +22,13 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase) :
     ViewModel() {
 
-    private val _data = MutableLiveData<UiState<MutableSet<WeatherModel>>>()
+    private val _data = MediatorLiveData<UiState<MutableSet<WeatherModel>>>()
     val data: LiveData<UiState<MutableSet<WeatherModel>>> = _data
     private val weatherSet = mutableSetOf<WeatherModel>()
 
-    fun searchWeather(query: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            weatherUseCase.searchWeather(query).collectLatest {
-                when (it) {
-                    is DataResource.Loading -> {
-                        _data.postValue(UiState.Loading)
-                    }
+    @OptIn(FlowPreview::class)
+    fun searchWeather(query: String) = weatherUseCase.searchWeather(query).debounce(1000).asLiveData(Dispatchers.IO)
 
-                    is DataResource.Success -> {
-                        if (it.data != null) {
-                            weatherSet.add(it.data!!)
-                            _data.postValue(UiState.Success(weatherSet))
-                        } else UiState.Empty
-                    }
-
-                    is DataResource.Error -> {
-                        if (it.errorCode == "#ER404") {
-                            _data.postValue(UiState.Empty)
-                        } else {
-                            _data.postValue(UiState.Error(it.exception.message, it.errorCode))
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     fun searchWeather(lat: Double, lon: Double) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -59,11 +39,11 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     }
 
                     is DataResource.Success -> {
-                        Log.d("data", "vm" + it.data.toString())
+                        Log.d("data", "vm lat ${it.data}")
                         if (it.data != null) {
                             weatherSet.add(it.data!!)
                             _data.postValue(UiState.Success(weatherSet))
-                        } else UiState.Empty
+                        } else _data.postValue(UiState.Empty)
                     }
 
                     is DataResource.Error -> {
@@ -87,9 +67,8 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     }
 
                     is DataResource.Success -> {
-                        it.data.forEach { data ->
-                            weatherSet.add(data)
-                        }
+                        weatherSet.clear()
+                        weatherSet.addAll(it.data)
                         _data.postValue(UiState.Success(weatherSet))
                     }
 
@@ -104,4 +83,6 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
             }
         }
     }
+
+    fun getLocation(): String? = weatherUseCase.getLocation()
 }

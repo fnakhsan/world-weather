@@ -9,7 +9,9 @@ import com.fnakhsan.worldweather.databinding.ActivityDetailWeatherBinding
 import com.fnakhsan.worldweather.ui.utils.EXTRA_WEATHER
 import com.fnakhsan.worldweather.ui.utils.iconUrlMapper
 import com.fnakhsan.worldweather.ui.utils.parcelable
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DetailWeatherActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailWeatherBinding
     override fun onCreate(savedInstanceState: Bundle?) {

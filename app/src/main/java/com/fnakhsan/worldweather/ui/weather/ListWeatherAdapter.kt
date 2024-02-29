@@ -43,6 +43,7 @@ class ListWeatherAdapter : RecyclerView.Adapter<ListWeatherAdapter.ListViewHolde
                 tvWeather.text = data.description
                 tvTemperature.text =
                     itemView.context.resources.getString(R.string.temperature, data.temperature)
+                tvLastUpdate.text = itemView.context.resources.getString(R.string.last_update, data.lastUpdate)
             }
             itemView.setOnClickListener { onItemClickCallback.onItemClicked(data) }
         }

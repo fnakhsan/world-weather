@@ -108,7 +108,7 @@ fun mapResponsesToFavEntities(response: WeatherResponse): WeatherEntity =
 
 fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
     entity.let {
-        Log.d("mapper", "mapEntitiesToModel")
+        Log.d("mapper", "mapEntitiesToModel $it")
         WeatherModel(
             id = it?.id.toString(),
             location = it?.location ?: "",

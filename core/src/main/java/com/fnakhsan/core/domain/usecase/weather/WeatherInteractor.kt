@@ -25,4 +25,8 @@ class WeatherInteractor @Inject constructor(private val weatherRepository: IWeat
     override fun isFavWeather(id: Int): Flow<Boolean> {
         return weatherRepository.isFavWeather(id = id)
     }
+
+    override fun getLocation(): String? {
+        return weatherRepository.getLocation()
+    }
 }

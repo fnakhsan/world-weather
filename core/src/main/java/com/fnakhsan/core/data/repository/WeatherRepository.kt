@@ -8,6 +8,7 @@ import com.fnakhsan.core.data.mapper.mapEntitiesToModel
 import com.fnakhsan.core.data.mapper.mapModelToFavEntities
 import com.fnakhsan.core.data.mapper.mapResponsesToEntities
 import com.fnakhsan.core.data.mapper.mapResponsesToFavEntities
+import com.fnakhsan.core.data.model.weather.WeatherEntity
 import com.fnakhsan.core.data.model.weather.WeatherResponse
 import com.fnakhsan.core.data.source.database.WeatherLocalDataSource
 import com.fnakhsan.core.data.source.datastore.WeatherDatastore
@@ -24,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
 class WeatherRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -32,7 +34,6 @@ class WeatherRepository @Inject constructor(
     private val weatherDatastore: WeatherDatastore,
     private val appExecutors: AppExecutors
 ) : IWeatherRepository {
-    private var weatherCurrLocation: WeatherModel? = null
 
     //    override fun searchWeather(query: String): Flow<DataResource<WeatherModel>> {
 //        return remoteDataSource.searchWeather(query)
@@ -42,7 +43,7 @@ class WeatherRepository @Inject constructor(
 //        return remoteDataSource.searchWeather(lat, lon)
 //    }
 
-    fun getLocation(): String? = runBlocking {
+    override fun getLocation(): String? = runBlocking {
         weatherDatastore.getLocation().first()
     }
 
@@ -50,11 +51,12 @@ class WeatherRepository @Inject constructor(
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
             override fun loadFromDB(): Flow<WeatherModel?> {
                 return localDataSource.getLocation(query).map {
+                    Log.d("query", it.location)
                     mapEntitiesToModel(it)
                 }
             }
 
-            override fun shouldFetch(data: WeatherModel?): Boolean = true
+            override fun shouldFetch(data: WeatherModel?): Boolean = isNetworkAvailable(context)
 
             override suspend fun createCall(): Flow<DataResource<WeatherResponse>> {
                 return remoteDataSource.searchWeather(query)
@@ -71,6 +73,7 @@ class WeatherRepository @Inject constructor(
             override fun loadFromDB(): Flow<WeatherModel?> {
                 Log.d("mapper", "loadDb $lat, $lon")
                 return localDataSource.getLocation(getLocation() ?: "").map {
+                    Log.d("lat lon", it.location)
                     mapEntitiesToModel(it)
                 }
             }
@@ -85,104 +88,22 @@ class WeatherRepository @Inject constructor(
                 weatherDatastore.saveLocation(data.name.toString())
                 val weather = mapResponsesToFavEntities(data)
                 Log.d("mapper", "saveDb $weather")
-                weatherCurrLocation = mapEntitiesToModel(weather)
                 localDataSource.upsertFavoriteLocation(weather)
             }
         }.asFlow()
 
-
-//    override fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>> {
-//        return localDataSource.getListFavoriteLocation().map {
-//            DataResource.Success(it.map { item ->
-//                searchWeather(item.location)
-//                mapEntitiesToModel(item)
-//            })
-//        }
-//    }
-
-//    suspend fun setInitFav() {
-//        Log.d("fav", "masuk")
-//        searchWeather("New York").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        searchWeather("Singapore").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        searchWeather("Mumbai").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        searchWeather("Delhi").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        searchWeather("Sydney").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        searchWeather("Melbourne").collectLatest {
-//            when (it) {
-//                is DataResource.Success -> {
-//                    if (it.data != null) {
-//                        setFavWeather(it.data)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//        val locations = setOf(
-//            "New York",
-//            "Singapore",
-//            "Mumbai",
-//            "Delhi",
-//            "Sydney",
-//            "Melbourne"
-//        )
-//    }
-
     override fun getFavListWeather(): Flow<DataResource<List<WeatherModel>>> =
         localDataSource.getListFavoriteLocation().map { list ->
-            list.filter {
-                it?.location != getLocation()
-            }.map { entity ->
+            val input: WeatherEntity? = list.first {
+                it?.location == getLocation()
+            }
+            if (input != null) {
+                rearrange(list, input).map { entity ->
+                    Log.d("tidak", "tdk mungkin")
+                    mapEntitiesToModel(entity)
+                }
+            } else list.map { entity ->
+                Log.d("tidak", "tdk mungkin")
                 mapEntitiesToModel(entity)
             }
         }.asDataResourceFlow(context)
@@ -199,5 +120,19 @@ class WeatherRepository @Inject constructor(
 
     override fun isFavWeather(id: Int): Flow<Boolean> {
         TODO("Not yet implemented")
+    }
+
+    fun <T> rearrange(items: List<T>, input: T): List<T> {
+        val index = items.indexOf(input)
+        val copy: MutableList<T>
+        if (index >= 0) {
+            copy = ArrayList(items.size)
+            copy.add(items[index])
+            copy.addAll(items.subList(0, index))
+            copy.addAll(items.subList(index + 1, items.size))
+        } else {
+            return items
+        }
+        return copy
     }
 }

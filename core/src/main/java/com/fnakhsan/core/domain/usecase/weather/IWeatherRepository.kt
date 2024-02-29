@@ -14,4 +14,6 @@ interface IWeatherRepository {
     fun setFavWeather(weatherModel: WeatherModel)
 
     fun isFavWeather(id: Int): Flow<Boolean>
+
+    fun getLocation(): String?
 }
