@@ -13,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fnakhsan.core.data.base.DataResource
 import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.R
 import com.fnakhsan.worldweather.databinding.ActivityMainBinding
@@ -59,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         binding.rvWeather.layoutManager = layoutManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getMyLastLocation()
-
         viewModel.data.observe(this) {
             when (it) {
                 is UiState.Loading -> showLoading(true)
@@ -88,6 +86,35 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.search.observe(this) {
+            when(it) {
+                is UiState.Loading -> showLoading(true)
+                is UiState.Error -> {
+                    showLoading(false)
+                    BaseSnackBar.errorSnackBar(
+                        binding.root,
+                        this,
+                        it.errorMessage ?: "",
+                        it.errorCode ?: ""
+                    )
+                }
+
+                is UiState.Empty -> {
+                    showLoading(false)
+                }
+
+                is UiState.Success -> {
+                    showLoading(false)
+                    Log.d("data", "${it.data}")
+                    runOnUiThread {
+                        val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
+                        intent.putExtra(EXTRA_WEATHER, it.data)
+                        startActivity(intent)
+                    }
+                }
+            }
+        }
+
         binding.apply {
             searchView.setupWithSearchBar(searchBar)
             searchView
@@ -98,32 +125,32 @@ class MainActivity : AppCompatActivity() {
                     val text = searchView.text.toString()
                     if (text.isNotBlank()) {
                         viewModel.searchWeather(searchView.text.toString())
-                            .observe(this@MainActivity) {
-                                when (it) {
-                                    is DataResource.Loading -> {
-                                        showLoading(true)
-                                    }
-
-                                    is DataResource.Success -> {
-                                        showLoading(false)
-                                        runOnUiThread() {
-                                            val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
-                                            intent.putExtra(EXTRA_WEATHER, it.data)
-                                            startActivity(intent)
-                                        }
-                                    }
-
-                                    is DataResource.Error -> {
-                                        showLoading(false)
-                                        BaseSnackBar.errorSnackBar(
-                                            binding.root,
-                                            this@MainActivity,
-                                            it.exception.message ?: "",
-                                            it.errorCode ?: ""
-                                        )
-                                    }
-                                }
-                            }
+//                        viewModel.search(searchView.text.toString()).observe(this@MainActivity) {
+//                                when (it) {
+//                                    is DataResource.Loading -> {
+//                                        showLoading(true)
+//                                    }
+//
+//                                    is DataResource.Success -> {
+//                                        showLoading(false)
+//                                        runOnUiThread {
+//                                            val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
+//                                            intent.putExtra(EXTRA_WEATHER, it.data)
+//                                            startActivity(intent)
+//                                        }
+//                                    }
+//
+//                                    is DataResource.Error -> {
+//                                        showLoading(false)
+//                                        BaseSnackBar.errorSnackBar(
+//                                            binding.root,
+//                                            this@MainActivity,
+//                                            it.exception.message ?: "",
+//                                            it.errorCode ?: ""
+//                                        )
+//                                    }
+//                                }
+//                            }
                     }
                     searchView.setText("")
                     searchView.hide()
@@ -143,16 +170,21 @@ class MainActivity : AppCompatActivity() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
             checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
         ) {
-            fusedLocationClient.getCurrentLocation(
-                Priority.PRIORITY_HIGH_ACCURACY,
-                CancellationTokenSource().token
-            ).addOnSuccessListener { location: Location? ->
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
+                    this.location = location
                     viewModel.searchWeather(
                         location.latitude,
                         location.longitude
                     )
                     viewModel.getFavLocationWeather()
+                }
+            }
+            fusedLocationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token
+            ).addOnSuccessListener { location: Location? ->
+                if (location != null) {
                     this.location = location
                 } else {
                     Toast.makeText(

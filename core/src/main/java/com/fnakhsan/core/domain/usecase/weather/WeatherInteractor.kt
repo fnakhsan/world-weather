@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class WeatherInteractor @Inject constructor(private val weatherRepository: IWeatherRepository): WeatherUseCase {
-    override fun searchWeather(query: String): Flow<DataResource<WeatherModel?>> {
-        return weatherRepository.searchWeather(query)
+    override fun searchQueryWeather(query: String): Flow<DataResource<WeatherModel?>> {
+        return weatherRepository.searchQueryWeather(query)
     }
 
     override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel?>> {
@@ -18,15 +18,11 @@ class WeatherInteractor @Inject constructor(private val weatherRepository: IWeat
         return weatherRepository.getFavListWeather()
     }
 
-    override fun setFavWeather(weatherModel: WeatherModel) {
-        return weatherRepository.setFavWeather(weatherModel)
+    override fun setFavWeather(weatherModel: WeatherModel, favorite: Boolean) {
+        return weatherRepository.setFavWeather(weatherModel, favorite)
     }
 
     override fun isFavWeather(id: Int): Flow<Boolean> {
         return weatherRepository.isFavWeather(id = id)
-    }
-
-    override fun getLocation(): String? {
-        return weatherRepository.getLocation()
     }
 }

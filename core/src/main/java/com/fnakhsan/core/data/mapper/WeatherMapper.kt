@@ -148,7 +148,7 @@ fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
         )
     }
 
-fun mapModelToFavEntities(weather: WeatherModel): WeatherEntity =
+fun mapModelToFavEntities(weather: WeatherModel, favorite: Boolean): WeatherEntity =
     weather.let {
         Log.d("mapper", "mapModelToEntities")
         WeatherEntity(
@@ -166,6 +166,6 @@ fun mapModelToFavEntities(weather: WeatherModel): WeatherEntity =
             windSpeed = it.windSpeed,
             visibility = it.visibility,
             cloudiness = it.cloudiness,
-            isFavorite = true
+            isFavorite = favorite
         )
     }

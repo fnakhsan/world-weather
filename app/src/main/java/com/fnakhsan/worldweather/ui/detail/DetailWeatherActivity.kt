@@ -1,6 +1,7 @@
 package com.fnakhsan.worldweather.ui.detail
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.fnakhsan.core.domain.model.WeatherModel
@@ -14,16 +15,36 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DetailWeatherActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailWeatherBinding
+    private val viewModel: DetailWeatherViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailWeatherBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val weather = intent.parcelable<WeatherModel>(EXTRA_WEATHER)
+        weather?.id?.toInt()?.let { viewModel.isFavorite(it) }
+
+
+        viewModel.isFavorite.observe(this) {
+            binding.btnFavorite.apply {
+                if (it) {
+                    setImageResource(R.drawable.ic_favorite_active_48)
+                    setOnClickListener {
+                        weather?.let { data -> viewModel.setFavorite(data, false) }
+                    }
+                } else {
+                    setImageResource(R.drawable.ic_favorite_default_48)
+                    setOnClickListener {
+                        weather?.let { data -> viewModel.setFavorite(data, true) }
+                    }
+                }
+            }
+        }
 
         binding.apply {
             tvLocation.text = weather?.location
-            Glide.with(this@DetailWeatherActivity).load(iconUrlMapper(weather?.iconUrl ?: "")).fitCenter()
+            Glide.with(this@DetailWeatherActivity).load(iconUrlMapper(weather?.iconUrl ?: ""))
+                .fitCenter()
                 .into(ivWeather)
             tvWeather.text = weather?.description
             tvDateTime.text = weather?.datetime
@@ -34,5 +55,7 @@ class DetailWeatherActivity : AppCompatActivity() {
             tvVisibility.text = getString(R.string.visibility, weather?.visibility ?: 0)
             tvCloudiness.text = getString(R.string.cloudiness, weather?.cloudiness ?: 0)
         }
+
+
     }
 }

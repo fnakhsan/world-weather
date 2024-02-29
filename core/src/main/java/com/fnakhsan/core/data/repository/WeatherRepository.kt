@@ -35,19 +35,11 @@ class WeatherRepository @Inject constructor(
     private val appExecutors: AppExecutors
 ) : IWeatherRepository {
 
-    //    override fun searchWeather(query: String): Flow<DataResource<WeatherModel>> {
-//        return remoteDataSource.searchWeather(query)
-//    }
-//
-//    override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel>> {
-//        return remoteDataSource.searchWeather(lat, lon)
-//    }
-
-    override fun getLocation(): String? = runBlocking {
+    fun getLocation(): String? = runBlocking {
         weatherDatastore.getLocation().first()
     }
 
-    override fun searchWeather(query: String): Flow<DataResource<WeatherModel?>> =
+    override fun searchQueryWeather(query: String): Flow<DataResource<WeatherModel?>> =
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
             override fun loadFromDB(): Flow<WeatherModel?> {
                 return localDataSource.getLocation(query).map {
@@ -56,7 +48,7 @@ class WeatherRepository @Inject constructor(
                 }
             }
 
-            override fun shouldFetch(data: WeatherModel?): Boolean = isNetworkAvailable(context)
+            override fun shouldFetch(): Boolean = isNetworkAvailable(context)
 
             override suspend fun createCall(): Flow<DataResource<WeatherResponse>> {
                 return remoteDataSource.searchWeather(query)
@@ -72,13 +64,13 @@ class WeatherRepository @Inject constructor(
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
             override fun loadFromDB(): Flow<WeatherModel?> {
                 Log.d("mapper", "loadDb $lat, $lon")
-                return localDataSource.getLocation(getLocation() ?: "").map {
+                return localDataSource.getLocation(getLocation() ?: "Kudus").map {
                     Log.d("lat lon", it.location)
                     mapEntitiesToModel(it)
                 }
             }
 
-            override fun shouldFetch(data: WeatherModel?): Boolean = isNetworkAvailable(context)
+            override fun shouldFetch(): Boolean = isNetworkAvailable(context)
 
             override suspend fun createCall(): Flow<DataResource<WeatherResponse>> {
                 return remoteDataSource.searchWeather(lat, lon)
@@ -109,20 +101,21 @@ class WeatherRepository @Inject constructor(
         }.asDataResourceFlow(context)
 
 
-    override fun setFavWeather(weatherModel: WeatherModel) {
+    override fun setFavWeather(weatherModel: WeatherModel, favorite: Boolean) {
         appExecutors.diskIO()
             .execute {
+                Log.d("db", "masuk $weatherModel $favorite")
                 localDataSource.upsertFavoriteLocation(
-                    mapModelToFavEntities(weatherModel)
+                    mapModelToFavEntities(weatherModel, favorite)
                 )
             }
     }
 
     override fun isFavWeather(id: Int): Flow<Boolean> {
-        TODO("Not yet implemented")
+        return localDataSource.isFavoriteLocation(id = id)
     }
 
-    fun <T> rearrange(items: List<T>, input: T): List<T> {
+    private fun <T> rearrange(items: List<T>, input: T): List<T> {
         val index = items.indexOf(input)
         val copy: MutableList<T>
         if (index >= 0) {
