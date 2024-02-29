@@ -12,12 +12,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.R
 import com.fnakhsan.worldweather.databinding.ActivityMainBinding
 import com.fnakhsan.worldweather.ui.detail.DetailWeatherActivity
 import com.fnakhsan.worldweather.ui.utils.BaseSnackBar
+import com.fnakhsan.worldweather.ui.utils.EXTRA_LOCATION
 import com.fnakhsan.worldweather.ui.utils.EXTRA_WEATHER
 import com.fnakhsan.worldweather.ui.utils.UiState
 import com.fnakhsan.worldweather.ui.weather.ListWeatherAdapter
@@ -27,6 +31,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -58,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvWeather.layoutManager = layoutManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getMyLastLocation()
+        viewModel.getFavLocationWeather()
         viewModel.data.observe(this) {
             when (it) {
                 is UiState.Loading -> showLoading(true)
@@ -78,38 +86,8 @@ class MainActivity : AppCompatActivity() {
 
                 is UiState.Success -> {
                     showLoading(false)
-                    Log.d("data", "${it.data}")
                     runOnUiThread {
-                        showData(it.data.toList())
-                    }
-                }
-            }
-        }
-
-        viewModel.search.observe(this) {
-            when(it) {
-                is UiState.Loading -> showLoading(true)
-                is UiState.Error -> {
-                    showLoading(false)
-                    BaseSnackBar.errorSnackBar(
-                        binding.root,
-                        this,
-                        it.errorMessage ?: "",
-                        it.errorCode ?: ""
-                    )
-                }
-
-                is UiState.Empty -> {
-                    showLoading(false)
-                }
-
-                is UiState.Success -> {
-                    showLoading(false)
-                    Log.d("data", "${it.data}")
-                    runOnUiThread {
-                        val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
-                        intent.putExtra(EXTRA_WEATHER, it.data)
-                        startActivity(intent)
+                        showData(it.data)
                     }
                 }
             }
@@ -120,41 +98,17 @@ class MainActivity : AppCompatActivity() {
             searchView
                 .editText
                 .setOnEditorActionListener { v, actionId, event ->
-                    Log.d("search", "$v : $actionId : $event")
                     searchBar.setText(searchView.text)
-                    val text = searchView.text.toString()
-                    if (text.isNotBlank()) {
-                        viewModel.searchWeather(searchView.text.toString())
-//                        viewModel.search(searchView.text.toString()).observe(this@MainActivity) {
-//                                when (it) {
-//                                    is DataResource.Loading -> {
-//                                        showLoading(true)
-//                                    }
-//
-//                                    is DataResource.Success -> {
-//                                        showLoading(false)
-//                                        runOnUiThread {
-//                                            val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
-//                                            intent.putExtra(EXTRA_WEATHER, it.data)
-//                                            startActivity(intent)
-//                                        }
-//                                    }
-//
-//                                    is DataResource.Error -> {
-//                                        showLoading(false)
-//                                        BaseSnackBar.errorSnackBar(
-//                                            binding.root,
-//                                            this@MainActivity,
-//                                            it.exception.message ?: "",
-//                                            it.errorCode ?: ""
-//                                        )
-//                                    }
-//                                }
-//                            }
+                    searchView.hide()
+                    Log.d("search", "sekali sih")
+                    if (searchView.text.isNotBlank()) {
+                        val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
+                        intent.putExtra(EXTRA_LOCATION, searchView.text.toString())
+                        startActivity(intent)
                     }
                     searchView.setText("")
-                    searchView.hide()
-                    true
+                    Log.d("search", "sini")
+                    false
                 }
         }
     }
@@ -173,11 +127,12 @@ class MainActivity : AppCompatActivity() {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     this.location = location
-                    viewModel.searchWeather(
-                        location.latitude,
-                        location.longitude
-                    )
-                    viewModel.getFavLocationWeather()
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        viewModel.searchWeather(
+                            location.latitude,
+                            location.longitude
+                        ).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect()
+                    }
                 }
             }
             fusedLocationClient.getCurrentLocation(
@@ -218,9 +173,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoading(it: Boolean) {
-        binding.apply {
-            progressBar.visibility = if (it) View.VISIBLE else View.INVISIBLE
-            rvWeather.visibility = if (it) View.INVISIBLE else View.VISIBLE
+        runOnUiThread {
+            binding.apply {
+                progressBar.visibility = if (it) View.VISIBLE else View.INVISIBLE
+                rvWeather.visibility = if (it) View.INVISIBLE else View.VISIBLE
+            }
         }
     }
 

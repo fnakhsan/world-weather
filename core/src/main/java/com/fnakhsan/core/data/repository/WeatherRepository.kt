@@ -1,9 +1,9 @@
 package com.fnakhsan.core.data.repository
 
 import android.content.Context
-import android.util.Log
 import com.fnakhsan.core.data.base.DataResource
 import com.fnakhsan.core.data.base.asDataResourceFlow
+import com.fnakhsan.core.data.mapper.localizeDateTime
 import com.fnakhsan.core.data.mapper.mapEntitiesToModel
 import com.fnakhsan.core.data.mapper.mapModelToFavEntities
 import com.fnakhsan.core.data.mapper.mapResponsesToEntities
@@ -43,7 +43,6 @@ class WeatherRepository @Inject constructor(
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
             override fun loadFromDB(): Flow<WeatherModel?> {
                 return localDataSource.getLocation(query).map {
-                    Log.d("query", it.location)
                     mapEntitiesToModel(it)
                 }
             }
@@ -63,9 +62,7 @@ class WeatherRepository @Inject constructor(
     override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel?>> =
         object : NetworkBoundDataResource<WeatherModel?, WeatherResponse>() {
             override fun loadFromDB(): Flow<WeatherModel?> {
-                Log.d("mapper", "loadDb $lat, $lon")
-                return localDataSource.getLocation(getLocation() ?: "Kudus").map {
-                    Log.d("lat lon", it.location)
+                return localDataSource.getLocation(getLocation() ?: "").map {
                     mapEntitiesToModel(it)
                 }
             }
@@ -79,7 +76,6 @@ class WeatherRepository @Inject constructor(
             override suspend fun saveCallResult(data: WeatherResponse) {
                 weatherDatastore.saveLocation(data.name.toString())
                 val weather = mapResponsesToFavEntities(data)
-                Log.d("mapper", "saveDb $weather")
                 localDataSource.upsertFavoriteLocation(weather)
             }
         }.asFlow()
@@ -91,12 +87,40 @@ class WeatherRepository @Inject constructor(
             }
             if (input != null) {
                 rearrange(list, input).map { entity ->
-                    Log.d("tidak", "tdk mungkin")
-                    mapEntitiesToModel(entity)
+                    WeatherModel(
+                        id = entity?.id.toString(),
+                        location = entity?.location ?: "",
+                        latitude = entity?.latitude ?: 0.0,
+                        longitude = entity?.longitude ?: 0.0,
+                        iconUrl = entity?.iconUrl ?: "",
+                        description = entity?.description ?: "",
+                        datetime = localizeDateTime(entity?.datetime ?: 0),
+                        lastUpdate = localizeDateTime(entity?.lastUpdate ?: 0),
+                        temperature = entity?.temperature ?: 0.0,
+                        feelsLike = entity?.feelsLike ?: 0.0,
+                        humidity = entity?.humidity ?: 0,
+                        windSpeed = entity?.windSpeed ?: 0.0,
+                        visibility = entity?.visibility ?: 0,
+                        cloudiness = entity?.cloudiness ?: 0,
+                    )
                 }
             } else list.map { entity ->
-                Log.d("tidak", "tdk mungkin")
-                mapEntitiesToModel(entity)
+                WeatherModel(
+                    id = entity?.id.toString(),
+                    location = entity?.location ?: "",
+                    latitude = entity?.latitude ?: 0.0,
+                    longitude = entity?.longitude ?: 0.0,
+                    iconUrl = entity?.iconUrl ?: "",
+                    description = entity?.description ?: "",
+                    datetime = localizeDateTime(entity?.datetime ?: 0),
+                    lastUpdate = localizeDateTime(entity?.lastUpdate ?: 0),
+                    temperature = entity?.temperature ?: 0.0,
+                    feelsLike = entity?.feelsLike ?: 0.0,
+                    humidity = entity?.humidity ?: 0,
+                    windSpeed = entity?.windSpeed ?: 0.0,
+                    visibility = entity?.visibility ?: 0,
+                    cloudiness = entity?.cloudiness ?: 0,
+                )
             }
         }.asDataResourceFlow(context)
 
@@ -104,7 +128,6 @@ class WeatherRepository @Inject constructor(
     override fun setFavWeather(weatherModel: WeatherModel, favorite: Boolean) {
         appExecutors.diskIO()
             .execute {
-                Log.d("db", "masuk $weatherModel $favorite")
                 localDataSource.upsertFavoriteLocation(
                     mapModelToFavEntities(weatherModel, favorite)
                 )

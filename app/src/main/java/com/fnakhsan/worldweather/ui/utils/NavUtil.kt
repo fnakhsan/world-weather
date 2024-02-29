@@ -6,6 +6,7 @@ import android.os.Parcelable
 
 
 const val EXTRA_WEATHER = "extra_weather"
+const val EXTRA_LOCATION = "extra_location"
 
 inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
     SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)

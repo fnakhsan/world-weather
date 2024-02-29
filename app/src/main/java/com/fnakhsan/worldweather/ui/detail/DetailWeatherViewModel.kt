@@ -19,6 +19,8 @@ class DetailWeatherViewModel @Inject constructor(private val weatherUseCase: Wea
     private val _isFavorite = MutableLiveData<Boolean>()
     val isFavorite: LiveData<Boolean> = _isFavorite
 
+    fun searchQueryWeather(query: String) = weatherUseCase.searchQueryWeather(query)
+
     fun isFavorite(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             weatherUseCase.isFavWeather(id = id).collectLatest {

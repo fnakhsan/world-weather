@@ -1,6 +1,5 @@
 package com.fnakhsan.core.data.mapper
 
-import android.util.Log
 import com.fnakhsan.core.data.model.weather.WeatherEntity
 import com.fnakhsan.core.data.model.weather.WeatherResponse
 import com.fnakhsan.core.domain.model.WeatherModel
@@ -35,7 +34,6 @@ fun epochMillisUtc(dateTimeString: String): Long {
     // Set the calendar's time zone to UTC
     calendar.timeZone = TimeZone.getTimeZone("UTC")
 
-    Log.d("dt", calendar.toString())
 
     // Get the milliseconds since epoch in UTC
     return calendar.timeInMillis
@@ -65,7 +63,6 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
 
 fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
     response.let {
-        Log.d("mapper", "mapResponsesToEntities")
         WeatherEntity(
             id = it.id ?: 0,
             location = response.name ?: "",
@@ -86,7 +83,6 @@ fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
 
 fun mapResponsesToFavEntities(response: WeatherResponse): WeatherEntity =
     response.let {
-        Log.d("mapper", "mapResponsesToEntities")
         WeatherEntity(
             id = it.id ?: 0,
             location = response.name ?: "",
@@ -108,7 +104,6 @@ fun mapResponsesToFavEntities(response: WeatherResponse): WeatherEntity =
 
 fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
     entity.let {
-        Log.d("mapper", "mapEntitiesToModel $it")
         WeatherModel(
             id = it?.id.toString(),
             location = it?.location ?: "",
@@ -129,7 +124,6 @@ fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
 
 fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
     weather.let {
-        Log.d("mapper", "mapModelToEntities")
         WeatherEntity(
             id = it.id.toInt(),
             location = it.location,
@@ -150,7 +144,6 @@ fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
 
 fun mapModelToFavEntities(weather: WeatherModel, favorite: Boolean): WeatherEntity =
     weather.let {
-        Log.d("mapper", "mapModelToEntities")
         WeatherEntity(
             id = it.id.toInt(),
             location = it.location,

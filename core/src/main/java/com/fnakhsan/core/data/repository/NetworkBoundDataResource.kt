@@ -1,6 +1,5 @@
 package com.fnakhsan.core.data.repository
 
-import android.util.Log
 import com.fnakhsan.core.data.base.DataResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -18,7 +17,6 @@ abstract class NetworkBoundDataResource<ResultType, RequestType> {
                 is DataResource.Success -> {
                     saveCallResult(apiResponse.data)
                     emitAll(loadFromDB().map {
-                        Log.d("data", "nbr $it")
                         DataResource.Success(it)
                     })
                 }
