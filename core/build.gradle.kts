@@ -67,4 +67,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+
+    //    Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

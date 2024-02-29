@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.R
@@ -27,6 +27,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ListWeatherFragment : Fragment() {
@@ -67,30 +69,7 @@ class ListWeatherFragment : Fragment() {
         binding?.rvWeather?.layoutManager = layoutManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         getMyLastLocation()
-        viewModel.data.observe(viewLifecycleOwner) {
-            when (it) {
-                is UiState.Loading -> showLoading(true)
-                is UiState.Error -> {
-                    showLoading(false)
-                    errorSnackBar(
-                        binding?.root!!,
-                        requireContext(),
-                        it.errorMessage ?: "",
-                        it.errorCode ?: ""
-                    )
-                }
 
-                is UiState.Empty -> {
-                    showLoading(false)
-                    binding?.rvWeather?.visibility = View.INVISIBLE
-                }
-
-                is UiState.Success -> {
-                    showLoading(false)
-                    showData(it.data.toList())
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {
@@ -111,7 +90,35 @@ class ListWeatherFragment : Fragment() {
         ) {
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, CancellationTokenSource().token).addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    viewModel.searchWeather(location.latitude, location.longitude)
+                    lifecycleScope.launch {
+                        async { viewModel.searchWeather(location.latitude, location.longitude) }.await()
+
+//                        val deferred2 = async { viewModel.getFavLocationWeather() }.await()
+                        viewModel.data.observe(viewLifecycleOwner) {
+                            when (it) {
+                                is UiState.Loading -> showLoading(true)
+                                is UiState.Error -> {
+                                    showLoading(false)
+                                    errorSnackBar(
+                                        binding?.root!!,
+                                        requireContext(),
+                                        it.errorMessage ?: "",
+                                        it.errorCode ?: ""
+                                    )
+                                }
+
+                                is UiState.Empty -> {
+                                    showLoading(false)
+                                    binding?.rvWeather?.visibility = View.INVISIBLE
+                                }
+
+                                is UiState.Success -> {
+                                    showLoading(false)
+                                    showData(it.data.toList())
+                                }
+                            }
+                        }
+                    }
                     this.location = location
                 } else {
                     Toast.makeText(

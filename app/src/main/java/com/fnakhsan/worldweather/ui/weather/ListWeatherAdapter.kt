@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.R
 import com.fnakhsan.worldweather.databinding.ItemWeatherBinding
+import com.fnakhsan.worldweather.ui.utils.iconUrlMapper
 
 class ListWeatherAdapter : RecyclerView.Adapter<ListWeatherAdapter.ListViewHolder>() {
     private lateinit var binding: ItemWeatherBinding
@@ -38,7 +39,7 @@ class ListWeatherAdapter : RecyclerView.Adapter<ListWeatherAdapter.ListViewHolde
         fun bind(data: WeatherModel) {
             binding.apply {
                 tvLocation.text = data.location
-                Glide.with(itemView.context).load(data.iconUrl).fitCenter().into(ivWeather)
+                Glide.with(itemView.context).load(iconUrlMapper(data.iconUrl)).fitCenter().into(ivWeather)
                 tvWeather.text = data.description
                 tvTemperature.text =
                     itemView.context.resources.getString(R.string.temperature, data.temperature)

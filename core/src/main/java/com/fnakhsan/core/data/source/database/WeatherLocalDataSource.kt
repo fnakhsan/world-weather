@@ -9,11 +9,14 @@ import javax.inject.Singleton
 @Singleton
 class WeatherLocalDataSource @Inject constructor(private val weatherDao: WeatherDao) {
 
-    fun getListFavoriteLocation(): Flow<List<WeatherEntity>> = weatherDao.getListFavoriteLocation()
+    fun getListFavoriteLocation(): Flow<List<WeatherEntity?>> = weatherDao.getListFavoriteLocation()
 
-    private val simpleSQLiteQuery = "SELECT * FROM weather WHERE location LIKE"
+    private val nameQuery = "SELECT * FROM weather WHERE location LIKE"
     fun getLocation(query: String): Flow<WeatherEntity> =
-        weatherDao.getLocation(SimpleSQLiteQuery("$simpleSQLiteQuery '$query' LIMIT 1"))
+        weatherDao.getLocation(SimpleSQLiteQuery("$nameQuery '$query'"))
+
+    fun getLocation(lat: Double, lon: Double): Flow<WeatherEntity> =
+        weatherDao.getLocation(SimpleSQLiteQuery("SELECT * FROM weather WHERE latitude LIKE '$lat' AND longitude LIKE '$lon'"))
 
     fun upsertFavoriteLocation(weatherEntity: WeatherEntity) =
         weatherDao.upsertFavoriteLocation(weatherEntity)

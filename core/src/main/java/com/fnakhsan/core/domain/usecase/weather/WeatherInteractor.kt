@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class WeatherInteractor @Inject constructor(private val weatherRepository: IWeatherRepository): WeatherUseCase {
-    override fun searchWeather(query: String): Flow<DataResource<WeatherModel>> {
+    override fun searchWeather(query: String): Flow<DataResource<WeatherModel?>> {
         return weatherRepository.searchWeather(query)
     }
 
-    override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel>> {
+    override fun searchWeather(lat: Double, lon: Double): Flow<DataResource<WeatherModel?>> {
         return weatherRepository.searchWeather(lat, lon)
     }
 

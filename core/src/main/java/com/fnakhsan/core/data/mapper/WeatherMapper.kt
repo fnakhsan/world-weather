@@ -32,7 +32,6 @@ fun epochMillisUtc(dateTimeString: String): Long {
         calendar.time = date
     }
 
-
     // Set the calendar's time zone to UTC
     calendar.timeZone = TimeZone.getTimeZone("UTC")
 
@@ -49,7 +48,9 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
     return WeatherModel(
         id = response.id.toString(),
         location = response.name ?: "",
-        iconUrl = iconUrlMapper(weather?.icon ?: ""),
+        latitude = response.coord?.lat ?: 0.0,
+        longitude = response.coord?.lon ?: 0.0,
+        iconUrl = weather?.icon ?: "",
         description = weather?.description ?: "",
         datetime = localizeDateTime(response.dt?.toLong() ?: 0),
         lastUpdate = localizeDateTime(nowDateTime),
@@ -64,10 +65,13 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
 
 fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
     response.let {
+        Log.d("mapper", "mapResponsesToEntities")
         WeatherEntity(
             id = it.id ?: 0,
             location = response.name ?: "",
-            iconUrl = iconUrlMapper(it.weather?.first()?.icon ?: ""),
+            latitude = it.coord?.lat ?: 0.0,
+            longitude = it.coord?.lon ?: 0.0,
+            iconUrl = it.weather?.first()?.icon ?: "",
             description = it.weather?.first()?.description ?: "",
             datetime = it.dt?.toLong() ?: 0,
             lastUpdate = LocalDateTime.now(ZoneOffset.UTC).toInstant(ZoneOffset.UTC).toEpochMilli(),
@@ -80,30 +84,36 @@ fun mapResponsesToEntities(response: WeatherResponse): WeatherEntity =
         )
     }
 
-fun mapEntitiesToModel(entity: WeatherEntity): WeatherModel =
+fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
     entity.let {
+        Log.d("mapper", "mapEntitiesToModel")
         WeatherModel(
-            id = it.id.toString(),
-            location = it.location,
-            iconUrl = iconUrlMapper(it.iconUrl),
-            description = it.description,
-            datetime = localizeDateTime(it.datetime),
-            lastUpdate = localizeDateTime(it.lastUpdate),
-            temperature = it.temperature,
-            feelsLike = it.feelsLike,
-            humidity = it.humidity,
-            windSpeed = it.windSpeed,
-            visibility = it.visibility,
-            cloudiness = it.cloudiness,
+            id = it?.id.toString(),
+            location = it?.location ?: "",
+            latitude = it?.latitude ?: 0.0,
+            longitude = it?.longitude ?: 0.0,
+            iconUrl = it?.iconUrl ?: "",
+            description = it?.description ?: "",
+            datetime = localizeDateTime(it?.datetime ?: 0),
+            lastUpdate = localizeDateTime(it?.lastUpdate ?: 0),
+            temperature = it?.temperature ?: 0.0,
+            feelsLike = it?.feelsLike ?: 0.0,
+            humidity = it?.humidity ?: 0,
+            windSpeed = it?.windSpeed ?: 0.0,
+            visibility = it?.visibility ?: 0,
+            cloudiness = it?.cloudiness ?: 0,
         )
     }
 
 fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
     weather.let {
+        Log.d("mapper", "mapModelToEntities")
         WeatherEntity(
             id = it.id.toInt(),
             location = it.location,
-            iconUrl = iconUrlMapper(it.iconUrl),
+            latitude = it.latitude,
+            longitude = it.longitude,
+            iconUrl = it.iconUrl,
             description = it.description,
             datetime = epochMillisUtc(it.datetime),
             lastUpdate = epochMillisUtc(it.lastUpdate),

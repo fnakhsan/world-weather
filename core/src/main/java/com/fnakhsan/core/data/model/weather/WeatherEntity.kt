@@ -12,6 +12,10 @@ data class WeatherEntity(
     @ColumnInfo
     val location: String,
     @ColumnInfo
+    val latitude: Double,
+    @ColumnInfo
+    val longitude: Double,
+    @ColumnInfo
     val iconUrl: String,
     @ColumnInfo
     val description: String,
@@ -34,7 +38,4 @@ data class WeatherEntity(
 
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean = false,
-
-    @ColumnInfo(name = "is_user_location")
-    var isUserLocation: Boolean = false
 )

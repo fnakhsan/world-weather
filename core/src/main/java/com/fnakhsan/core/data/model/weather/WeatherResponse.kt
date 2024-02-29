@@ -74,10 +74,10 @@ data class Clouds(
 data class Coord(
 
 	@field:SerializedName("lon")
-	val lon: Any? = null,
+	val lon: Double? = null,
 
 	@field:SerializedName("lat")
-	val lat: Any? = null
+	val lat: Double? = null
 )
 
 data class Main(

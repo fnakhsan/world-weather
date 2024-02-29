@@ -7,6 +7,7 @@ import com.fnakhsan.core.domain.model.WeatherModel
 import com.fnakhsan.worldweather.R
 import com.fnakhsan.worldweather.databinding.ActivityDetailWeatherBinding
 import com.fnakhsan.worldweather.ui.utils.EXTRA_WEATHER
+import com.fnakhsan.worldweather.ui.utils.iconUrlMapper
 import com.fnakhsan.worldweather.ui.utils.parcelable
 
 class DetailWeatherActivity : AppCompatActivity() {
@@ -20,7 +21,7 @@ class DetailWeatherActivity : AppCompatActivity() {
 
         binding.apply {
             tvLocation.text = weather?.location
-            Glide.with(this@DetailWeatherActivity).load(weather?.iconUrl).fitCenter()
+            Glide.with(this@DetailWeatherActivity).load(iconUrlMapper(weather?.iconUrl ?: "")).fitCenter()
                 .into(ivWeather)
             tvWeather.text = weather?.description
             tvDateTime.text = weather?.datetime

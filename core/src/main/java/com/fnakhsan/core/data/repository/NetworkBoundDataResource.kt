@@ -1,5 +1,6 @@
 package com.fnakhsan.core.data.repository
 
+import android.util.Log
 import com.fnakhsan.core.data.base.DataResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -11,18 +12,21 @@ abstract class NetworkBoundDataResource<ResultType, RequestType> {
 
     private var result: Flow<DataResource<ResultType>> = flow {
         emit(DataResource.Loading)
-        val dbSource = loadFromDB().first()
+        val dbSource = loadFromDB(null).first()
         if (shouldFetch(dbSource)) {
             emit(DataResource.Loading)
             when (val apiResponse = createCall().first()) {
                 is DataResource.Success -> {
-                    saveCallResult(apiResponse.data)
-                    emitAll(loadFromDB().map { DataResource.Success(it) })
+                    val data = apiResponse.data
+                    saveCallResult(data)
+                    emitAll(loadFromDB(data).map {
+                        Log.d("data", "nbr $it")
+                        DataResource.Success(it)
+                    })
                 }
 
                 is DataResource.Error -> {
                     onFetchFailed()
-
                     emit(DataResource.Error(apiResponse.exception, apiResponse.errorCode))
                 }
 
@@ -31,13 +35,13 @@ abstract class NetworkBoundDataResource<ResultType, RequestType> {
                 }
             }
         } else {
-            emitAll(loadFromDB().map { DataResource.Success(it) })
+            emitAll(loadFromDB(null).map { DataResource.Success(it) })
         }
     }
 
     protected open fun onFetchFailed() {}
 
-    protected abstract fun loadFromDB(): Flow<ResultType>
+    protected abstract fun loadFromDB(data: RequestType?): Flow<ResultType>
 
     protected abstract fun shouldFetch(data: ResultType?): Boolean
 
