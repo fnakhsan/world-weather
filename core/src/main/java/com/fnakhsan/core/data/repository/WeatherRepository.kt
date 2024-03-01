@@ -3,7 +3,6 @@ package com.fnakhsan.core.data.repository
 import android.content.Context
 import com.fnakhsan.core.data.base.DataResource
 import com.fnakhsan.core.data.base.asDataResourceFlow
-import com.fnakhsan.core.data.mapper.localizeDateTime
 import com.fnakhsan.core.data.mapper.mapEntitiesToModel
 import com.fnakhsan.core.data.mapper.mapModelToFavEntities
 import com.fnakhsan.core.data.mapper.mapResponsesToEntities
@@ -87,40 +86,10 @@ class WeatherRepository @Inject constructor(
             }
             if (input != null) {
                 rearrange(list, input).map { entity ->
-                    WeatherModel(
-                        id = entity?.id.toString(),
-                        location = entity?.location ?: "",
-                        latitude = entity?.latitude ?: 0.0,
-                        longitude = entity?.longitude ?: 0.0,
-                        iconUrl = entity?.iconUrl ?: "",
-                        description = entity?.description ?: "",
-                        datetime = localizeDateTime(entity?.datetime ?: 0),
-                        lastUpdate = localizeDateTime(entity?.lastUpdate ?: 0),
-                        temperature = entity?.temperature ?: 0.0,
-                        feelsLike = entity?.feelsLike ?: 0.0,
-                        humidity = entity?.humidity ?: 0,
-                        windSpeed = entity?.windSpeed ?: 0.0,
-                        visibility = entity?.visibility ?: 0,
-                        cloudiness = entity?.cloudiness ?: 0,
-                    )
+                    mapEntitiesToModel(entity)
                 }
             } else list.map { entity ->
-                WeatherModel(
-                    id = entity?.id.toString(),
-                    location = entity?.location ?: "",
-                    latitude = entity?.latitude ?: 0.0,
-                    longitude = entity?.longitude ?: 0.0,
-                    iconUrl = entity?.iconUrl ?: "",
-                    description = entity?.description ?: "",
-                    datetime = localizeDateTime(entity?.datetime ?: 0),
-                    lastUpdate = localizeDateTime(entity?.lastUpdate ?: 0),
-                    temperature = entity?.temperature ?: 0.0,
-                    feelsLike = entity?.feelsLike ?: 0.0,
-                    humidity = entity?.humidity ?: 0,
-                    windSpeed = entity?.windSpeed ?: 0.0,
-                    visibility = entity?.visibility ?: 0,
-                    cloudiness = entity?.cloudiness ?: 0,
-                )
+                mapEntitiesToModel(entity)
             }
         }.asDataResourceFlow(context)
 

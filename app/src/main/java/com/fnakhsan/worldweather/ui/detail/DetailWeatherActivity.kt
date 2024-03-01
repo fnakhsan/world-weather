@@ -66,7 +66,7 @@ class DetailWeatherActivity : AppCompatActivity() {
     }
 
     private fun showData(weather: WeatherModel) {
-        viewModel.isFavorite(weather.id.toInt())
+        viewModel.isFavorite(weather.id)
 
         binding.apply {
             tvLocation.text = weather.location

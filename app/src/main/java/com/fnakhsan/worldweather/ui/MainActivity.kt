@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                     searchBar.setText(searchView.text)
                     searchView.hide()
                     Log.d("search", "sekali sih")
-                    if (searchView.text.isNotBlank()) {
+                    if (searchView.text.isNotEmpty()) {
                         val intent = Intent(this@MainActivity, DetailWeatherActivity::class.java)
                         intent.putExtra(EXTRA_LOCATION, searchView.text.toString())
                         startActivity(intent)

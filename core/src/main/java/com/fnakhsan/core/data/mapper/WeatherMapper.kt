@@ -44,7 +44,7 @@ fun weatherResponseToModel(response: WeatherResponse): WeatherModel {
     val weather = response.weather?.first()
     val main = response.main
     return WeatherModel(
-        id = response.id.toString(),
+        id = response.id ?: 0,
         location = response.name ?: "",
         latitude = response.coord?.lat ?: 0.0,
         longitude = response.coord?.lon ?: 0.0,
@@ -105,7 +105,7 @@ fun mapResponsesToFavEntities(response: WeatherResponse): WeatherEntity =
 fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
     entity.let {
         WeatherModel(
-            id = it?.id.toString(),
+            id = it?.id ?: 0,
             location = it?.location ?: "",
             latitude = it?.latitude ?: 0.0,
             longitude = it?.longitude ?: 0.0,
@@ -125,7 +125,7 @@ fun mapEntitiesToModel(entity: WeatherEntity?): WeatherModel =
 fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
     weather.let {
         WeatherEntity(
-            id = it.id.toInt(),
+            id = it.id,
             location = it.location,
             latitude = it.latitude,
             longitude = it.longitude,
@@ -145,7 +145,7 @@ fun mapModelToEntities(weather: WeatherModel): WeatherEntity =
 fun mapModelToFavEntities(weather: WeatherModel, favorite: Boolean): WeatherEntity =
     weather.let {
         WeatherEntity(
-            id = it.id.toInt(),
+            id = it.id,
             location = it.location,
             latitude = it.latitude,
             longitude = it.longitude,

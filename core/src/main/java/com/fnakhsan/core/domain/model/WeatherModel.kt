@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class WeatherModel(
-    val id: String,
+    val id: Int,
     val location: String,
     val latitude: Double,
     val longitude: Double,
